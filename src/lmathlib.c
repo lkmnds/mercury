@@ -236,23 +236,21 @@ static int math_max (lua_State *L) {
   return 1;
 }
 
-unsigned long
-    seedx = 192411,
-    seedy = 39401242,
-    seedz = 6638491,
-    seedw = 38413,
-    seedv = 8374610;
+#define M_RANDMAX 2147483647
 
-double mer_rand(void){
-    unsigned long t;
-    t = (seedx ^ (seedx >> 7));
-    seedx = seedy;
-    seedy = seedz;
-    seedz = seedw;
-    seedw = seedv;
-    seedv = (seedv ^ (seedv << 6)) ^ (t ^ (t << 13));
-    return (double)((seedy+seedy+1)*seedv);
+static unsigned int z1 = 12345, z2 = 12345, z3 = 12345, z4 = 12345;
 
+unsigned int mer_rand(void){
+    unsigned int b;
+    b  = ((z1 << 6) ^ z1) >> 13;
+    z1 = ((z1 & 4294967294U) << 18) ^ b;
+    b  = ((z2 << 2) ^ z2) >> 27;
+    z2 = ((z2 & 4294967288U) << 2) ^ b;
+    b  = ((z3 << 13) ^ z3) >> 21;
+    z3 = ((z3 & 4294967280U) << 7) ^ b;
+    b  = ((z4 << 3) ^ z4) >> 12;
+    z4 = ((z4 & 4294967168U) << 13) ^ b;
+    return (z1 ^ z2 ^ z3 ^ z4);
 }
 
 /*
@@ -262,7 +260,7 @@ double mer_rand(void){
 */
 static int math_random (lua_State *L) {
     lua_Integer low = 0, up = 0;
-    double r = mer_rand();
+    double r = (double)mer_rand() * (1.0 / ((double)M_RANDMAX + 1.0));
 
     switch (lua_gettop(L)) {
         case 0: {
@@ -295,7 +293,7 @@ static int math_random (lua_State *L) {
 
 static int math_randomseed (lua_State *L) {
     unsigned int init_seed = (unsigned int)(lua_Integer)luaL_checknumber(L, 1);
-    seedx = init_seed;
+    z1 = z2 = z3 = z4 = init_seed;
     //seedy = (seedx << 2);
     //seedz = (seedx >> 17);
     //seedw = ;
