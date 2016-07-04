@@ -107,6 +107,7 @@ freebsd:
 generic: $(ALL)
 
 linux:
+	cd scripts && ./xxdfy.sh && cd ..
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_LINUX" SYSLIBS="-Wl,-E -ldl -lreadline"
 
 macosx:

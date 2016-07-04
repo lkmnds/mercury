@@ -300,10 +300,6 @@ static int math_randomseed (lua_State *L) {
     z1 = init_seed;
     z2 = (z1 << 2);
     z3 = (z1 >> 17);
-    //seedy = (seedx << 2);
-    //seedz = (seedx >> 17);
-    //seedw = ;
-    //seedv = ;
 
     // call mer_rand three times because... just because.
     (void)mer_rand();

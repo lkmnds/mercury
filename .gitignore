@@ -37,3 +37,6 @@
 
 # Mercury results
 build/
+
+# xxd files
+*.xxd

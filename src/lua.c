@@ -457,7 +457,7 @@ static int handle_script (lua_State *L, char **argv) {
 /*
 ** Traverses all arguments from 'argv', returning a mask with those
 ** needed before running any Lua code (or an error code if it finds
-** any invalid argument). 'first' returns the first not-handled argument 
+** any invalid argument). 'first' returns the first not-handled argument
 ** (either the script name or a bad argument in case of error).
 */
 static int collectargs (char **argv, int *first) {
@@ -481,7 +481,7 @@ static int collectargs (char **argv, int *first) {
         args |= has_E;
         break;
       case 'i':
-        args |= has_i;  /* (-i implies -v) *//* FALLTHROUGH */ 
+        args |= has_i;  /* (-i implies -v) *//* FALLTHROUGH */
       case 'v':
         if (argv[i][2] != '\0')  /* extra characters after 1st? */
           return has_error;  /* invalid option */
@@ -566,6 +566,12 @@ static int pmain (lua_State *L) {
     lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
   }
   luaL_openlibs(L);  /* open standard libraries */
+
+  const char string_mer[] = {
+  #include "scripts/string.mer.xxd"
+  };
+  luaL_dostring(L, string_mer);
+
   createargtable(L, argv, argc, script);  /* create table 'arg' */
   if (!(args & has_E)) {  /* no option '-E'? */
     if (handle_luainit(L) != LUA_OK)  /* run LUA_INIT */
@@ -606,4 +612,3 @@ int main (int argc, char **argv) {
   lua_close(L);
   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
