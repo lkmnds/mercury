@@ -567,11 +567,6 @@ static int pmain (lua_State *L) {
   }
   luaL_openlibs(L);  /* open standard libraries */
 
-  const char string_mer[] = {
-  #include "scripts/string.mer.xxd"
-  };
-  luaL_dostring(L, string_mer);
-
   createargtable(L, argv, argc, script);  /* create table 'arg' */
   if (!(args & has_E)) {  /* no option '-E'? */
     if (handle_luainit(L) != LUA_OK)  /* run LUA_INIT */
