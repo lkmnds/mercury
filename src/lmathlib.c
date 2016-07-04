@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "lua.h"
 
@@ -238,8 +239,10 @@ static int math_max (lua_State *L) {
 
 #define M_RANDMAX 2147483647
 
-static unsigned int z1 = 12345, z2 = 12345, z3 = 12345, z4 = 12345;
+// seed values
+unsigned int z1 = 12345, z2 = 12345, z3 = 12345, z4 = 12345;
 
+// http://www.iro.umontreal.ca/~simardr/rng/lfsr113.c
 unsigned int mer_rand(void){
     unsigned int b;
     b  = ((z1 << 6) ^ z1) >> 13;
@@ -250,7 +253,7 @@ unsigned int mer_rand(void){
     z3 = ((z3 & 4294967280U) << 7) ^ b;
     b  = ((z4 << 3) ^ z4) >> 12;
     z4 = ((z4 & 4294967168U) << 13) ^ b;
-    return (z1 ^ z2 ^ z3 ^ z4);
+    return (z1 ^ z2 ^ z3 ^ z4) % M_RANDMAX;
 }
 
 /*
@@ -260,12 +263,13 @@ unsigned int mer_rand(void){
 */
 static int math_random (lua_State *L) {
     lua_Integer low = 0, up = 0;
-    double r = (double)mer_rand() * (1.0 / ((double)M_RANDMAX + 1.0));
+    double dr = (double)mer_rand();
+    double r = dr * (1.0 / ((double)M_RANDMAX + 1.0));
 
     switch (lua_gettop(L)) {
         case 0: {
             lua_pushnumber(L, (lua_Number)r);
-            break;
+            return 1;
         }
         case 1: {
             low = 0;
@@ -293,13 +297,19 @@ static int math_random (lua_State *L) {
 
 static int math_randomseed (lua_State *L) {
     unsigned int init_seed = (unsigned int)(lua_Integer)luaL_checknumber(L, 1);
-    z1 = z2 = z3 = z4 = init_seed;
+    z1 = init_seed;
+    z2 = (z1 << 2);
+    z3 = (z1 >> 17);
     //seedy = (seedx << 2);
     //seedz = (seedx >> 17);
     //seedw = ;
     //seedv = ;
 
-    (void)mer_rand(); /* discard first value to avoid undesirable correlations */
+    // call mer_rand three times because... just because.
+    (void)mer_rand();
+    (void)mer_rand();
+    (void)mer_rand();
+
     return 0;
 }
 
