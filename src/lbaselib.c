@@ -450,6 +450,42 @@ static int luaB_tostring (lua_State *L) {
 }
 
 
+int tc_verify(const unsigned char *x,const unsigned char *y)
+{
+  unsigned int differentbits = 0;
+#define F(i) differentbits |= x[i] ^ y[i];
+  F(0)
+  F(1)
+  F(2)
+  F(3)
+  F(4)
+  F(5)
+  F(6)
+  F(7)
+  F(8)
+  F(9)
+  F(10)
+  F(11)
+  F(12)
+  F(13)
+  F(14)
+  F(15)
+  return (1 & ((differentbits - 1) >> 8)) - 1; /* returns 0 if equal, 0xFF..FF otherwise */
+}
+
+int luaB_tccmp(lua_State *L){
+    luaL_checktype(L, 1, LUA_TSTRING);
+    luaL_checktype(L, 2, LUA_TSTRING);
+
+    unsigned char * v1 = (unsigned char *)luaL_checkstring(L, 1);
+    unsigned char * v2 = (unsigned char *)luaL_checkstring(L, 2);
+
+    int result = tc_verify((void*)v1, (void*)v2);
+    lua_pushboolean(L, !result);
+
+    return 1;
+}
+
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
@@ -476,6 +512,7 @@ static const luaL_Reg base_funcs[] = {
   {"tostring", luaB_tostring},
   {"type", luaB_type},
   {"xpcall", luaB_xpcall},
+  {"tccmp", luaB_tccmp},
   /* placeholders */
   {"_G", NULL},
   {"_VERSION", NULL},
@@ -495,4 +532,3 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   lua_setfield(L, -2, "_VERSION");
   return 1;
 }
-
