@@ -13,7 +13,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-#define MERCURY_VERSION 001
+#define MERCURY_VERSION "001"
 
 int mer_hello(lua_State *L){
 	lua_pushstring(L, "HELLO WORLD!!!!!!!!!");
@@ -28,7 +28,7 @@ static const luaL_Reg mercurylib[] = {
 
 LUAMOD_API int luaopen_mercury (lua_State *L){
 	luaL_newlib(L, mercurylib);
-	lua_pushnumber(L, MERCURY_VERSION);
+	lua_pushstring(L, MERCURY_VERSION);
 	lua_setfield(L, -2, "version");
 	return 1;
 }
