@@ -450,26 +450,27 @@ static int luaB_tostring (lua_State *L) {
 }
 
 
+#define TCVER_CMP(i) differentbits |= x[i] ^ y[i];
+
 int tc_verify(const unsigned char *x,const unsigned char *y)
 {
   unsigned int differentbits = 0;
-#define F(i) differentbits |= x[i] ^ y[i];
-  F(0)
-  F(1)
-  F(2)
-  F(3)
-  F(4)
-  F(5)
-  F(6)
-  F(7)
-  F(8)
-  F(9)
-  F(10)
-  F(11)
-  F(12)
-  F(13)
-  F(14)
-  F(15)
+  TCVER_CMP(0)
+  TCVER_CMP(1)
+  TCVER_CMP(2)
+  TCVER_CMP(3)
+  TCVER_CMP(4)
+  TCVER_CMP(5)
+  TCVER_CMP(6)
+  TCVER_CMP(7)
+  TCVER_CMP(8)
+  TCVER_CMP(9)
+  TCVER_CMP(10)
+  TCVER_CMP(11)
+  TCVER_CMP(12)
+  TCVER_CMP(13)
+  TCVER_CMP(14)
+  TCVER_CMP(15)
   return (1 & ((differentbits - 1) >> 8)) - 1; /* returns 0 if equal, 0xFF..FF otherwise */
 }
 
